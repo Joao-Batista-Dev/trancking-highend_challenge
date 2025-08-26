@@ -27,6 +27,7 @@ def get_countries_all():
     except Exception:
         return []
 
+
 def get_countrie_by_name(name: str):
     url = f"{BASE_URL}/name/{name}"
     
