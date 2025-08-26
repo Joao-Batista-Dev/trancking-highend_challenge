@@ -6,4 +6,4 @@ class Assessment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-       return f"{self.pais} - {'curti' if self.curti else 'não curti'}"
+       return f"{self.countrie} - {'curti' if self.liked else 'não curti'}"
