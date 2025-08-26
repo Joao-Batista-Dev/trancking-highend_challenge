@@ -124,4 +124,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-
+COUNTRYLAYER_API_KEY = '4ae9903cad21db1f11c5956fddbe8086'
