@@ -75,7 +75,7 @@ docker-compose exec countries_app python manage.py runserver 0.0.0.0:8000
   "countrie": "argentina",
   "liked": true
 }
-}
+
 ```
 
 
