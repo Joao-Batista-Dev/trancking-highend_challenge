@@ -4,9 +4,6 @@ from rest_framework import status
 from countries.models import Assessment
 from countries.serializers import AssessmentSerializer
 from countries.countries_api import get_countries_all, get_countrie_by_name
-import logging
-
-logger = logging.getLogger("myapp")
 
 
 class GetTopCountriesApiViews(APIView):
@@ -59,7 +56,6 @@ class PostCountriesLikedApiViews(APIView):
         liked = request.data.get('liked')
 
         if countrie is None or liked is None:
-            logger.warning("Dados incompletos enviados na requisição POST")
             return Response({
                 "error": "Verifique se os dados estão corretos!",
             }, status=status.HTTP_400_BAD_REQUEST)
