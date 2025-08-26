@@ -4,16 +4,25 @@ from rest_framework import status
 from countries.models import Assessment
 from countries.serializers import AssessmentSerializer
 from countries.countries_api import get_countries_all, get_countrie_by_name
+import logging
+
+logger = logging.getLogger("myapp")
+
 
 class GetTopCountriesApiViews(APIView):
     def get(self, request):
-        countries = get_countries_all()
+        try:
+            countries = get_countries_all()
 
-        get_top_10 = sorted(
-            countries,
-            key=lambda x: x["populacao"], 
-            reverse=True
-        )[:10]
+            get_top_10 = sorted(
+                countries,
+                key=lambda x: x["populacao"], 
+                reverse=True
+             )[:10]
+        except Exception:
+            return Response({
+                "error": "Erro ao buscar países"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(get_top_10)
 
@@ -24,17 +33,24 @@ class GetCountriesApiViews(APIView):
         if not name:
             return Response({"erro": "Informe o parâmetro ?name="}, status=status.HTTP_400_BAD_REQUEST)
 
-        countrie = get_countrie_by_name(name)  
-        if not countrie:
-            return Response({"erro": "País não encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            countrie = get_countrie_by_name(name)  
+            if not countrie:
+                return Response({
+                    "erro": "País não encontrado"
+                }, status=status.HTTP_404_NOT_FOUND)
 
-        country_name = countrie["name"]["common"]
-        assessment = Assessment.objects.filter(countrie=country_name)
+            country_name = countrie["name"]["common"]
+            assessment = Assessment.objects.filter(countrie=country_name)
 
-        countrie["curtidas"] = assessment.filter(liked=True).count()
-        countrie["nao_curtidas"] = assessment.filter(liked=False).count()
+            countrie["curtidas"] = assessment.filter(liked=True).count()
+            countrie["nao_curtidas"] = assessment.filter(liked=False).count()
 
-        return Response(countrie)
+            return Response(countrie)
+        except Exception:
+            return Response({
+                "error": "Erro ao buscar país"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PostCountriesLikedApiViews(APIView):
@@ -43,23 +59,27 @@ class PostCountriesLikedApiViews(APIView):
         liked = request.data.get('liked')
 
         if countrie is None or liked is None:
+            logger.warning("Dados incompletos enviados na requisição POST")
             return Response({
                 "error": "Verifique se os dados estão corretos!",
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        assessment = Assessment.objects.create(countrie=countrie, liked=liked)
+        try:
+            assessment = Assessment.objects.create(countrie=countrie, liked=liked)
 
-        total_likes = Assessment.objects.filter(countrie=countrie).count()
-        likes = Assessment.objects.filter(countrie=countrie, liked=True).count()
-        not_lkes = Assessment.objects.filter(countrie=countrie, liked=False).count()
+            total_likes = Assessment.objects.filter(countrie=countrie).count()
+            likes = Assessment.objects.filter(countrie=countrie, liked=True).count()
+            not_lkes = Assessment.objects.filter(countrie=countrie, liked=False).count()
 
-        return Response({
-            "countrie": countrie,
-            "status": "sucesso",
-            "total_likes": total_likes,
-            "likes": likes,
-            "not_likes": not_lkes
-        }, status=status.HTTP_201_CREATED)
+            return Response({
+                "countrie": countrie,
+                "status": "sucesso",
+                "total_likes": total_likes,
+                "likes": likes,
+                "not_likes": not_lkes
+            }, status=status.HTTP_201_CREATED)
+        except Exception:
+            return Response({"error": "Erro ao salvar avaliação"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

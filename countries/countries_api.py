@@ -8,10 +8,12 @@ def get_countries_all():
         "fields": "name,population,region"
     }
 
-    response = requests.get(url, params=params)
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
 
-    if response.status_code == 200:
         data = response.json()
+
         return [
             {
                 "nome": countrie.get("name", {}).get("common"),
@@ -22,15 +24,19 @@ def get_countries_all():
 
             if countrie.get("name") and isinstance(countrie.get("population"), int)
         ]
-    return []
+    except Exception:
+        return []
 
 def get_countrie_by_name(name: str):
     url = f"{BASE_URL}/name/{name}"
-    response = requests.get(url)
+    
+    try: 
+        response = requests.get(url)
+        response.raise_for_status()
 
-    if response.status_code == 200:
         data = response.json()
 
         if data:
             return data[0]
-    return None
+    except Exception:
+        return None

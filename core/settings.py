@@ -124,4 +124,19 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-COUNTRYLAYER_API_KEY = '4ae9903cad21db1f11c5956fddbe8086'
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {"format": "{levelname} {asctime} {module} {message}", "style": "{"},
+        "simple": {"format": "{levelname} {message}", "style": "{"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+        "file": {"class": "logging.FileHandler", "filename": "django.log", "formatter": "verbose"},
+    },
+    "loggers": {
+        "django": {"handlers": ["console", "file"], "level": "INFO", "propagate": True},
+        "myapp": {"handlers": ["console", "file"], "level": "DEBUG", "propagate": False},
+    },
+}
